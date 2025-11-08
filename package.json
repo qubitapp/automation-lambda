@@ -1,0 +1,25 @@
+{
+    "name": "scraper-serverless",
+    "version": "1.0.0",
+    "description": "Serverless API project",
+    "main": "handler.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "serverless offline",
+        "dev": "serverless offline start",
+        "local": "serverless invoke local -f hello"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "dependencies": {
+        "dotenv": "^17.2.3",
+        "pg": "^8.16.3",
+        "python-shell": "^5.0.0",
+        "sequelize": "^6.37.7",
+        "serverless": "^3.38.0"
+    },
+    "devDependencies": {
+        "serverless-offline": "^14.4.0"
+    }
+}

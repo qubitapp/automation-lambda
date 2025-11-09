@@ -3,7 +3,7 @@
 const { PythonShell } = require('python-shell');
 const path = require('path');
 const fs = require('fs').promises;
-const News = require('./models/news');
+const RawNews = require('./models/rawNews');
 const sequelize = require('./config/database');
 
 // Enable Sequelize logging
@@ -14,8 +14,8 @@ const initializeDatabase = async () => {
     try {
         await sequelize.authenticate();
         console.log('Database connection established.');
-        await News.sync();
-        console.log('News table created successfully.');
+        await RawNews.sync();
+        console.log('RawNews table created successfully.');
     } catch (error) {
         console.error('Database initialization error:', error);
         throw error;
@@ -62,11 +62,11 @@ const processNewsItems = async (newsItems, category, state) => {
             }
 
             // Check if article already exists
-            const existingNews = await News.findOne({ where: { url: url } });
+            const existingNews = await RawNews.findOne({ where: { url: url } });
 
             if (!existingNews) {
                 // Create new record only if it doesn't exist
-                const createdNews = await News.create({
+                const createdNews = await RawNews.create({
                     category: category,
                     url: url,
                     newsDetails: newsItem

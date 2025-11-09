@@ -1,6 +1,6 @@
 'use strict';
 
-const News = require('./models/news');
+const RawNews = require('./models/rawNews');
 const sequelize = require('./config/database');
 
 // Initialize database connection
@@ -41,7 +41,7 @@ module.exports.handler = async (event) => {
         }
 
         // Find the news item first to check if it exists
-        const newsItem = await News.findOne({
+        const newsItem = await RawNews.findOne({
             where: { newsId },
             attributes: ['newsId', 'category', 'url'], // Only fetch necessary fields
             raw: true
@@ -62,7 +62,7 @@ module.exports.handler = async (event) => {
         }
 
         // Delete the news item
-        await News.destroy({
+        await RawNews.destroy({
             where: { newsId }
         });
 

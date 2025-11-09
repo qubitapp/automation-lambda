@@ -1,6 +1,6 @@
 'use strict';
 
-const News = require('./models/news');
+const RawNews = require('./models/rawNews');
 const sequelize = require('./config/database');
 const { Op } = require('sequelize');
 
@@ -29,7 +29,7 @@ module.exports.handler = async (event) => {
         const category = queryParams.category;
         const page = parseInt(queryParams.page) || 1;
         const limit = parseInt(queryParams.limit) || 10;
-        
+
         // Validate pagination parameters
         if (page < 1) {
             return {
@@ -62,15 +62,8 @@ module.exports.handler = async (event) => {
         // Calculate offset for pagination
         const offset = (page - 1) * limit;
 
-        // Create base query
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-
-        const whereClause = {
-            createdAt: {
-                [Op.gte]: today
-            }
-        };
+        // Create base query - fetch all news, not just today's
+        const whereClause = {};
 
         // Add category filter if provided
         if (category) {
@@ -78,7 +71,7 @@ module.exports.handler = async (event) => {
         }
 
         // Query the database with pagination
-        const { count, rows: news } = await News.findAndCountAll({
+        const { count, rows: news } = await RawNews.findAndCountAll({
             where: whereClause,
             order: [['createdAt', 'DESC']],
             limit: limit,

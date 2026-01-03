@@ -7,7 +7,6 @@ provider:
   runtime: nodejs20.x
   region: ap-south-1
   environment:
-    AWS_REGION: ${self:provider.region}
     STAGE: ${self:provider.stage}
 
 functions:

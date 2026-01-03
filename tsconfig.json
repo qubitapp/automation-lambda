@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2020", // esbuild compiles modern JS
+    "module": "ESNext", // Use ESNext for optimal tree-shaking
+    "esModuleInterop": true, // Still needed for CommonJS compatibility
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "outDir": "./dist",
+    "skipLibCheck": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true, // Optional: if you're importing .json
+    "allowSyntheticDefaultImports": true,
+    "typeRoots": ["src/typings", "node_modules/@types"]
+  },
+  "include": ["src/**/*"]
+}

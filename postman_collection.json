@@ -1,0 +1,281 @@
+{
+  "info": {
+    "name": "Qubit Automation Lambda API",
+    "description": "Complete API collection for Qubit Backend - News Scraping, Approval & Publishing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "prodUrl",
+      "value": "https://your-api-gateway-url.execute-api.ap-south-1.amazonaws.com/dev",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            },
+            "description": "Check if the server is running"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Scraper",
+      "item": [
+        {
+          "name": "Run Scheduled Scraper",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/scraper/run?limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["scraper", "run"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "20",
+                  "description": "Number of articles to scrape (default: 20)"
+                }
+              ]
+            },
+            "description": "Manually trigger the scheduled scraping operation"
+          },
+          "response": []
+        },
+        {
+          "name": "Scrape Specific URLs",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"urls\": [\n    \"https://example.com/article1\",\n    \"https://example.com/article2\"\n  ],\n  \"category\": \"Marketing\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/scraper/urls",
+              "host": ["{{baseUrl}}"],
+              "path": ["scraper", "urls"]
+            },
+            "description": "Scrape specific URLs provided in the request body"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Approval",
+      "item": [
+        {
+          "name": "Get Pending News",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/approval/pending?limit=50&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["approval", "pending"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Number of results (default: 50)"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Pagination offset (default: 0)"
+                }
+              ]
+            },
+            "description": "Get all pending news articles awaiting approval"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Approved News",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/approval/approved?limit=50&offset=0",
+              "host": ["{{baseUrl}}"],
+              "path": ["approval", "approved"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50",
+                  "description": "Number of results (default: 50)"
+                },
+                {
+                  "key": "offset",
+                  "value": "0",
+                  "description": "Pagination offset (default: 0)"
+                }
+              ]
+            },
+            "description": "Get all approved and AI-processed news articles"
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Single News",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/approval/approve/:rawNewsId",
+              "host": ["{{baseUrl}}"],
+              "path": ["approval", "approve", ":rawNewsId"],
+              "variable": [
+                {
+                  "key": "rawNewsId",
+                  "value": "your-raw-news-uuid-here",
+                  "description": "UUID of the raw news article to approve"
+                }
+              ]
+            },
+            "description": "Approve a pending news article and process it with OpenAI"
+          },
+          "response": []
+        },
+        {
+          "name": "Bulk Approve News",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rawNewsIds\": [\n    \"uuid-1\",\n    \"uuid-2\",\n    \"uuid-3\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/approval/approve/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["approval", "approve", "bulk"]
+            },
+            "description": "Approve multiple news articles in batch"
+          },
+          "response": []
+        },
+        {
+          "name": "Reject News",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/approval/reject/:rawNewsId",
+              "host": ["{{baseUrl}}"],
+              "path": ["approval", "reject", ":rawNewsId"],
+              "variable": [
+                {
+                  "key": "rawNewsId",
+                  "value": "your-raw-news-uuid-here",
+                  "description": "UUID of the raw news article to reject"
+                }
+              ]
+            },
+            "description": "Reject and delete a pending news article"
+          },
+          "response": []
+        },
+        {
+          "name": "Publish News",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/approval/publish/:filteredId",
+              "host": ["{{baseUrl}}"],
+              "path": ["approval", "publish", ":filteredId"],
+              "variable": [
+                {
+                  "key": "filteredId",
+                  "value": "your-filtered-news-uuid-here",
+                  "description": "UUID of the filtered/approved news to publish"
+                }
+              ]
+            },
+            "description": "Mark an approved article as published"
+          },
+          "response": []
+        },
+        {
+          "name": "Reprocess AI Content",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/approval/reprocess/:filteredId",
+              "host": ["{{baseUrl}}"],
+              "path": ["approval", "reprocess", ":filteredId"],
+              "variable": [
+                {
+                  "key": "filteredId",
+                  "value": "your-filtered-news-uuid-here",
+                  "description": "UUID of the filtered/approved news to reprocess"
+                }
+              ]
+            },
+            "description": "Regenerate AI content for an approved article"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Scheduled Scraper (Lambda Direct)",
+      "item": [
+        {
+          "name": "Invoke Scheduled Scraper (AWS CLI)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"source\": \"eventbridge.schedule\",\n  \"action\": \"scrape\"\n}"
+            },
+            "url": {
+              "raw": "{{prodUrl}}/scraper/run",
+              "host": ["{{prodUrl}}"],
+              "path": ["scraper", "run"]
+            },
+            "description": "This simulates what EventBridge sends to the scheduled Lambda. For direct Lambda invocation, use AWS CLI (see description below).\n\n---\nTo invoke the Lambda directly via AWS CLI:\n\naws lambda invoke \\\n  --function-name automation-lambda-dev-scheduledScraper \\\n  --payload '{\"source\": \"eventbridge.schedule\", \"action\": \"scrape\"}' \\\n  --cli-binary-format raw-in-base64-out \\\n  response.json\n\ncat response.json"
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

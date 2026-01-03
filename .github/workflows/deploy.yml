@@ -1,0 +1,61 @@
+name: Deploy Serverless App
+
+on:
+  push:
+    branches:
+      - development  # Change this if using another branch
+
+jobs:
+  deploy:
+    name: Deploy to AWS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
+        
+      - name: Install Yarn
+        run: npm install -g yarn
+
+      - name: Install All Dependencies (Including Dev)
+        run: yarn install  # Installs all dependencies for build
+
+  
+    #   - name: Install Only Production Dependencies
+    #     run: npm install -f  --only=production  # Installs only required dependencies
+
+      - name: Install Serverless Framework
+        run: npm install -g serverless@3
+
+      - name: Configure Serverless with AWS Credentials
+        run: serverless config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+
+      - name: Set environment variables
+        id: env
+        run: |
+          STAGE="dev"
+          echo "STAGE=$STAGE" >> $GITHUB_OUTPUT
+
+      - name: Create .env.${{ steps.env.outputs.STAGE }} from secrets
+        run: |
+          cat <<EOF > .env.${{ steps.env.outputs.STAGE }}
+          STAGE=${{ steps.env.outputs.STAGE }}
+          NODE_ENV=${{ steps.env.outputs.STAGE }}
+          AWS_REGION=ap-south-1
+          SQL_DATABASE=${{ secrets.SQL_DATABASE }}
+          SQL_HOST=${{ secrets.SQL_HOST }}
+          SQL_PORT=5432
+          SQL_USER=${{ secrets.SQL_USER }}
+          SQL_PASSWORD=${{ secrets.SQL_PASSWORD }}
+          SQL_LOG=true
+          OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+          EOF
+
+      - name: Deploy to AWS using Serverless
+        run: serverless deploy --stage ${{ steps.env.outputs.STAGE }} --force --verbose

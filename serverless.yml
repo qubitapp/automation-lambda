@@ -1,64 +1,91 @@
-service: scraper-serverless
+service: qubitRawAutomation
+description: Qubit Raw Automation service to fetch news from various sources and process them
 
-frameworkVersion: '3'
-
-plugins:
-  - serverless-offline
+frameworkVersion: "3"
 
 provider:
   name: aws
-  runtime: nodejs18.x
-  region: us-east-1
   stage: ${opt:stage, 'dev'}
-  timeout: 30 # 30 seconds timeout
+  runtime: nodejs20.x
+  region: ap-south-1
   environment:
-    NODE_ENV: ${opt:stage, 'dev'}
-    # DB_HOST: ${env:DB_HOST}
-    # DB_USER: ${env:DB_USER}
-    # DB_PASSWORD: ${env:DB_PASSWORD}
-    # DB_NAME: ${env:DB_NAME}
+    AWS_REGION: ${self:provider.region}
+    STAGE: ${self:provider.stage}
 
+plugins:
+  - serverless-esbuild
+  - serverless-dotenv-plugin
+  - serverless-offline
+
+# ------------------------------
+# FUNCTIONS
+# ------------------------------
 functions:
-  hello:
-    handler: src/handler.hello
+  # Express / API Gateway
+  app:
+    handler: src/app.handler
+    timeout: 60
     events:
       - http:
-          path: hello
-          method: get
+          path: /
+          method: any
           cors: true
-  execute:
-    handler: src/executeScript.execute
-    events:
       - http:
-          path: execute
-          method: post
+          path: /{proxy+}
+          method: any
           cors: true
-  status:
-    handler: src/executeScript.status
-    events:
-      - http:
-          path: execute/{executionId}
-          method: get
-          cors: true
-          
-  getTodayNews:
-    handler: src/getTodayNews.handler
-    events:
-      - http:
-          path: news/today
-          method: get
-          cors: true
-          request:
-            parameters:
-              querystrings:
-                category: false # Optional category filter
-                page: false     # Optional page number (default: 1)
-                limit: false    # Optional items per page (default: 10, max: 100)
+    layers:
+      - { Ref: PgLayerLambdaLayer }
 
-  deleteNews:
-    handler: src/deleteNews.handler
+  # EventBridge scheduled scraper (Node)
+  scheduledScraper:
+    handler: src/handlers/scheduledScraper.handler
+    timeout: 300
+    memorySize: 512
+    layers:
+      - { Ref: PgLayerLambdaLayer }
     events:
-      - http:
-          path: news/{newsId}
-          method: delete
-          cors: true
+      - schedule:
+          rate: rate(6 hours)
+          enabled: true
+          description: Scrape news from configured sources every 6 hours
+          input:
+            source: eventbridge.schedule
+            action: scrape
+
+# ------------------------------
+# PACKAGING
+# ------------------------------
+package:
+  individually: true
+  excludeDevDependencies: true
+  patterns:
+    - '!news.json'
+    - '!.env'
+    - '!README.md'
+
+# ------------------------------
+# BUILD CONFIG
+# ------------------------------
+custom:
+  esbuild:
+    bundle: true
+    minify: true
+    sourcemap: true
+    target: node20
+    platform: node
+    keepOutputDirectory: true
+    concurrency: 10
+    external:
+      - pg
+
+# ------------------------------
+# LAYERS
+# ------------------------------
+layers:
+  pg-layer:
+    path: layers/pg-layer
+    name: pg-lambda-layer
+    description: PostgreSQL driver layer
+    compatibleRuntimes:
+      - nodejs20.x

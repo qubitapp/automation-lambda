@@ -47,7 +47,6 @@ jobs:
           cat <<EOF > .env.${{ steps.env.outputs.STAGE }}
           STAGE=${{ steps.env.outputs.STAGE }}
           NODE_ENV=${{ steps.env.outputs.STAGE }}
-          AWS_REGION=ap-south-1
           SQL_DATABASE=${{ secrets.SQL_DATABASE }}
           SQL_HOST=${{ secrets.SQL_HOST }}
           SQL_PORT=5432

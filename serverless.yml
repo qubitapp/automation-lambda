@@ -22,8 +22,6 @@ functions:
     handler: src/handlers/scheduledScraper.handler
     timeout: 300
     memorySize: 512
-    layers:
-      - { Ref: PgLayerLambdaLayer }
     events:
       - schedule:
           rate: rate(6 hours)

@@ -1,8 +1,6 @@
 service: qubitRawAutomation
 description: Qubit Raw Automation service to fetch news from various sources and process them
 
-frameworkVersion: "3"
-
 provider:
   name: aws
   stage: ${opt:stage, 'dev'}
@@ -12,31 +10,13 @@ provider:
     AWS_REGION: ${self:provider.region}
     STAGE: ${self:provider.stage}
 
-plugins:
-  - serverless-esbuild
-  - serverless-dotenv-plugin
-  - serverless-offline
-
-# ------------------------------
-# FUNCTIONS
-# ------------------------------
 functions:
-  # Express / API Gateway
   app:
     handler: src/app.handler
     timeout: 60
     events:
-      - http:
-          path: /
-          method: any
-          cors: true
-      - http:
-          path: /{proxy+}
-          method: any
-          cors: true
-    layers:
-      - { Ref: PgLayerLambdaLayer }
-
+      - http: ANY /
+      - http: ANY /{proxy+}
   # EventBridge scheduled scraper (Node)
   scheduledScraper:
     handler: src/handlers/scheduledScraper.handler
@@ -52,21 +32,17 @@ functions:
           input:
             source: eventbridge.schedule
             action: scrape
+   
 
-# ------------------------------
-# PACKAGING
-# ------------------------------
 package:
   individually: true
   excludeDevDependencies: true
-  patterns:
-    - '!news.json'
-    - '!.env'
-    - '!README.md'
 
-# ------------------------------
-# BUILD CONFIG
-# ------------------------------
+plugins:
+  - serverless-esbuild
+  - serverless-dotenv-plugin
+  - serverless-offline
+
 custom:
   esbuild:
     bundle: true
@@ -77,15 +53,13 @@ custom:
     keepOutputDirectory: true
     concurrency: 10
     external:
-      - pg
+      - pg 
 
-# ------------------------------
-# LAYERS
-# ------------------------------
 layers:
   pg-layer:
     path: layers/pg-layer
     name: pg-lambda-layer
-    description: PostgreSQL driver layer
     compatibleRuntimes:
       - nodejs20.x
+    description: PostgreSQL driver layer
+   

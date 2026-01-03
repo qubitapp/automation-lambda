@@ -8,29 +8,25 @@
         "start": "rimraf dist && tsc && sls offline start",
         "start:dev": "rimraf dist && tsc && node dist/app.js",
         "dev": "sls offline start",
-        "deploy": "sls deploy",
-        "scraper:install": "cd scrapers && pip install -r requirements.txt",
-        "scraper:test": "cd scrapers && python3 scraper_handler.py scheduled 5"
+        "deploy": "sls deploy"
     },
-    "keywords": [
-        "news",
-        "automation",
-        "lambda",
-        "scraper"
-    ],
+    "keywords": [],
     "author": "",
     "license": "ISC",
     "dependencies": {
         "@types/cheerio": "^0.22.35",
-        "axios": "^1.10.0",
         "cheerio": "^1.1.2",
+        "axios": "^1.10.0",
         "cors": "^2.8.5",
+        "esbuild": "^0.25.3",
         "express": "^4.21.2",
         "pg": "^8.15.5",
         "pg-hstore": "^2.3.4",
-        "python-shell": "^5.0.0",
         "sequelize": "^6.37.7",
+        "serverless-dotenv-plugin": "^6.0.0",
+        "serverless-esbuild": "^1.55.0",
         "serverless-http": "^3.2.0",
+        "serverless-offline": "^14.4.0",
         "uuid": "^11.1.0",
         "winston": "^3.19.0"
     },
@@ -39,14 +35,8 @@
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.1",
         "@types/jsonwebtoken": "^9.0.9",
-        "@types/node": "^22.10.2",
         "@types/pg": "^8.11.14",
-        "@types/uuid": "^10.0.0",
-        "esbuild": "^0.25.3",
         "rimraf": "^6.0.1",
-        "serverless-dotenv-plugin": "^6.0.0",
-        "serverless-esbuild": "^1.55.0",
-        "serverless-offline": "^14.4.0",
         "ts-node": "^10.9.2",
         "typescript": "^5.8.3"
     }

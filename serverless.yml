@@ -16,19 +16,19 @@ functions:
     events:
       - http: ANY /
       - http: ANY /{proxy+}
-  # # EventBridge scheduled scraper (Node)
-  # scheduledScraper:
-  #   handler: src/handlers/scheduledScraper.handler
-  #   timeout: 300
-  #   memorySize: 512
-  #   events:
-  #     - schedule:
-  #         rate: rate(6 hours)
-  #         enabled: true
-  #         description: Scrape news from configured sources every 6 hours
-  #         input:
-  #           source: eventbridge.schedule
-  #           action: scrape
+  # EventBridge scheduled scraper (Node)
+  scheduledScraper:
+    handler: src/handlers/scheduledScraper.handler
+    timeout: 300
+    memorySize: 512
+    events:
+      - schedule:
+          rate: rate(6 hours)
+          enabled: true
+          description: Scrape news from configured sources every 6 hours
+          input:
+            source: eventbridge.schedule
+            action: scrape
    
 
 package:
